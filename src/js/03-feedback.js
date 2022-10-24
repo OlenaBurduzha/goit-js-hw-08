@@ -1,33 +1,33 @@
-import Throttle from "lodash.throttle";
-// // import form from "../css/03-feedback.css"
+import throttle from "lodash.throttle";
 
-const form = document.querySelector("feedback-form");
-const formData = {"email":"","message":""};
+const refs = {
+    form: document.querySelector(".feedback-form"),
+    input: document.querySelector("input"),
+    textarea: document.querySelector("textarea"),
+};
+const STORAGE_KEY = "feedback-form-state";
+const formData = {};
+const getformData = localStorage.getItem(STORAGE_KEY);
 
-// const form = {
-//     input: document.querySelector("input"),
-//     textarea: document.querySelector("textarea"),
-// }
+refs.form.addEventListener("input", throttle(onTextAreaInput, 500));
+refs.form.addEventListener("submit", throttle(onFormSudmit, 500))
 
-// refs.form.addEventListener('input', throttle(onTextAreaInput, 500));
+function onTextAreaInput(event) {
+    formData[event.target.name] = event.target.value;
+    const valueFormData = JSON.stringify(formData);
+    localStorage.setItem(STORAGE_KEY, valueFormData);
+};
 
-// function onTextAreaInput() {
-//     formData[e.target.name] = e.target.value;
-//     localStorage.getItem()
-// }
+function onFormSudmit(event) {
+    event.preventDefault();
+    event.currentTarget.reset();
+    localStorage.removeItem(STORAGE_KEY);
+}
 
-form.addEventListener("input", Throttle((event) => {
-        if (event.target.nodeName==="INPUT") {
-            formData.email = event.target.value;
-        } else if (event.target.nodeName==="TEXTAREA") {
-            formData.message = event.target.value;
-        }
-        if (formData) {
-            localStorage.setItem("feedback-form-state", JSON.stringify(formData));
-        }
-    }, 500));
-if (localStorage.getItem("feedback-form-state")) { 
-        data = JSON.parse(localStorage.getItem("feedback-form-state"));
-    }
-    email.value = formData.email;
-message.value = formData.message;
+if (getformData) {
+    const getValue = JSON.parse(getformData);
+    refs.input.value = getValue.email;
+    refs.textarea.value = getValue.message;
+}
+
+
